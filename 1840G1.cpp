@@ -76,40 +76,31 @@ void _print(T t, V... v) {__print(t); if (sizeof...(v)) cerr << ", "; _print(v..
 #endif
 // ================================== Debug Ends ==================================
 void solve(){
-    ll n, flag = 0;
-    cin>>n;
-    set<ll> unused;
-    for(ll i = 0; i<n; i++) unused.insert(i);
-    vl v(n/2), perm(n);
-    for(ll i = 0; i<n/2; i++){
-        cin>>v[i];
-        v[i]--;
-        if(perm[v[i]] == 1){
-            flag = 1;
-        }
-        perm[v[i]] = 1;
-        unused.erase(v[i]);
-    }
-    if(flag == 1){
-        cout<<"-1\n";
-        return;
-    }
-    vl ans;
-    for(ll i = n/2 -1; i>=0; i--){
-        auto it = unused.lower_bound(v[i]);
-        if(it == unused.begin()){
-            cout<<"-1\n";
+    ll x;
+    cin>>x;
+    mll mp;
+    mp[x] = 1;
+    for(ll i = 2; i<=1001; i++){
+        cout<<"+ 1"<<endl;
+        ll dum;
+        cin>>dum;
+        if(mp.count(dum)){
+            cout<<"! "<<i - 1<<endl;
             return;
         }
-        it--;
-        ans.pb(v[i]);
-        ans.pb(*it);
-        unused.erase(it);
+        mp[dum] = i;
     }
-    reverse(ans.begin(), ans.end());
-    assert(ans.size() == n);
-    for(ll i = 0; i<n; i++) cout<<ans[i] + 1<<' ';
-    cout<<"\n";
+    ll ans = 1001;
+    for(ll i = 0; i<1023; i++){
+        cout<<"+ 1000"<<endl;
+        ans += 1000;
+        ll dum;
+        cin>>dum;
+        if(mp.count(dum)){
+            cout<<"! "<<ans - mp[dum]<<endl;
+            return;
+        }
+    }
 }
  
 int main(){
@@ -119,7 +110,8 @@ int main(){
     //    freopen("input.txt", "r", stdin);
     //    freopen("output.txt", "w", stdout);
     // #endif
-    ll t; cin>>t;
+    // srand(time(0));
+    ll t; t = 1;
     while(t--) solve();
     return 0;
 }

@@ -76,40 +76,75 @@ void _print(T t, V... v) {__print(t); if (sizeof...(v)) cerr << ", "; _print(v..
 #endif
 // ================================== Debug Ends ==================================
 void solve(){
-    ll n, flag = 0;
-    cin>>n;
-    set<ll> unused;
-    for(ll i = 0; i<n; i++) unused.insert(i);
-    vl v(n/2), perm(n);
-    for(ll i = 0; i<n/2; i++){
-        cin>>v[i];
-        v[i]--;
-        if(perm[v[i]] == 1){
-            flag = 1;
-        }
-        perm[v[i]] = 1;
-        unused.erase(v[i]);
+    ll n, q;
+    cin>>n>>q;
+    string s;
+    cin>>s;
+    ll num1 = 0, num2 = 0, flag = 0;
+    for(ll i = 0; i<n; i++){
+        if(s[i] == '(') num1++;
+        else num2++;
     }
-    if(flag == 1){
-        cout<<"-1\n";
+    // debug(num1, num2);
+    if((abs(num2 - num1) & 1)    || (n == 1)){
+        for(ll i = 0; i<q; i++){
+            ll dum;
+            cin>>dum;
+            cout<<"NO\n";
+        }
         return;
     }
-    vl ans;
-    for(ll i = n/2 -1; i>=0; i--){
-        auto it = unused.lower_bound(v[i]);
-        if(it == unused.begin()){
-            cout<<"-1\n";
-            return;
+    num2 = 0, num1 = 0;
+    set<ll> open, close;
+    for(ll i = 0; i<n - 1; i++){
+        if(s[i] == s[i+1]){
+            if(s[i] == '(') open.insert(i);
+            else close.insert(i);
         }
-        it--;
-        ans.pb(v[i]);
-        ans.pb(*it);
-        unused.erase(it);
     }
-    reverse(ans.begin(), ans.end());
-    assert(ans.size() == n);
-    for(ll i = 0; i<n; i++) cout<<ans[i] + 1<<' ';
-    cout<<"\n";
+    while(q--){
+        ll dum;
+        cin>>dum;
+        dum--;
+        s[dum] = '(' + ')' - s[dum];
+        if(n == 2){
+            if(s == "()") cout<<"YES\n";
+            else cout<<"NO\n";
+            continue;
+        }
+        if(dum > 0){
+            open.erase(dum -1);
+            close.erase(dum -1);
+            if(s[dum] == s[dum-1]){
+                if(s[dum] == '(')open.insert(dum -1);
+                else close.insert(dum -1);
+            }
+        }
+        if(dum < n-1){
+            open.erase(dum);
+            close.erase(dum);
+            if(s[dum] == s[dum + 1]){
+                if(s[dum] == '(')open.insert(dum);
+                else close.insert(dum);
+            }
+        }
+
+        if(s[0] != '('    || s[n-1] != ')'){
+            cout<<"NO\n";
+            continue;
+        }
+        // debug(s);
+        // debug(open, close);
+        // debug(q, open.size(), close.size());
+        if(open.size() == 0 && close.size() == 0) cout<<"YES\n";
+        else if(open.size() != 0 && close.size() != 0){
+            if(*open.begin() < *close.begin()  && *open.rbegin() < *close.rbegin()) cout<<"YES\n";
+            else cout<<"NO\n";
+        }
+        else {
+            cout<<"NO\n";
+        }
+    }
 }
  
 int main(){
@@ -119,7 +154,7 @@ int main(){
     //    freopen("input.txt", "r", stdin);
     //    freopen("output.txt", "w", stdout);
     // #endif
-    ll t; cin>>t;
+    ll t; t = 1;
     while(t--) solve();
     return 0;
 }

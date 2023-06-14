@@ -75,41 +75,61 @@ void _print(T t, V... v) {__print(t); if (sizeof...(v)) cerr << ", "; _print(v..
 #define debug(x...)
 #endif
 // ================================== Debug Ends ==================================
-void solve(){
-    ll n, flag = 0;
-    cin>>n;
-    set<ll> unused;
-    for(ll i = 0; i<n; i++) unused.insert(i);
-    vl v(n/2), perm(n);
-    for(ll i = 0; i<n/2; i++){
-        cin>>v[i];
-        v[i]--;
-        if(perm[v[i]] == 1){
-            flag = 1;
-        }
-        perm[v[i]] = 1;
-        unused.erase(v[i]);
+
+ll MAXN = 1e10+10;
+vl fib, pref;
+void fibonacci(){
+    fib.resize(2, 1LL);
+    while(fib.back() <= (MAXN)){
+        ll ind = fib.size() - 1;
+        ll dum = fib[ind] + fib[ind-1];
+        fib.pb(dum);
     }
-    if(flag == 1){
-        cout<<"-1\n";
+    pref.resize(fib.size());
+    partial_sum(all(fib), pref.begin());
+}
+
+void solve(){
+    ll n;
+    cin>>n;
+    vl v(n);
+    cin>>v;
+    if(n == 1){
+        if(v[0] == 1) cout<<"YES\n";
+        else cout<<"NO\n";
         return;
     }
-    vl ans;
-    for(ll i = n/2 -1; i>=0; i--){
-        auto it = unused.lower_bound(v[i]);
-        if(it == unused.begin()){
-            cout<<"-1\n";
+    ll sum = accumulate(all(v), 0LL);
+    ll dum = 0;
+    if(!binary_search(all(pref), sum)){
+        cout<<"NO\n";
+        return;
+    }
+    ll ind = 0;
+    // debug(sum);
+    for(ll i = 0; i<pref.size(); i++){
+        ind = i;
+        if(pref[i] == sum) break;
+    }
+    priority_queue<ll> pq;
+    for(ll i = 0; i<n; i++){
+        pq.push(v[i]);
+    }
+    ll prev = 0;
+    for(ll i = ind; i>=0; i--){
+        if(pq.empty() || pq.top() < fib[i]){
+            cout<<"NO\n";
             return;
         }
-        it--;
-        ans.pb(v[i]);
-        ans.pb(*it);
-        unused.erase(it);
+        ll dum = pq.top();
+        pq.pop();
+        // debug(dum);
+        if(prev != 0) pq.push(prev);
+        prev = dum - fib[i];
+        // debug(prev);
     }
-    reverse(ans.begin(), ans.end());
-    assert(ans.size() == n);
-    for(ll i = 0; i<n; i++) cout<<ans[i] + 1<<' ';
-    cout<<"\n";
+    cout<<"YES\n";
+    
 }
  
 int main(){
@@ -119,6 +139,7 @@ int main(){
     //    freopen("input.txt", "r", stdin);
     //    freopen("output.txt", "w", stdout);
     // #endif
+    fibonacci();
     ll t; cin>>t;
     while(t--) solve();
     return 0;

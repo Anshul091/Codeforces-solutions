@@ -76,40 +76,65 @@ void _print(T t, V... v) {__print(t); if (sizeof...(v)) cerr << ", "; _print(v..
 #endif
 // ================================== Debug Ends ==================================
 void solve(){
-    ll n, flag = 0;
-    cin>>n;
-    set<ll> unused;
-    for(ll i = 0; i<n; i++) unused.insert(i);
-    vl v(n/2), perm(n);
-    for(ll i = 0; i<n/2; i++){
-        cin>>v[i];
-        v[i]--;
-        if(perm[v[i]] == 1){
-            flag = 1;
+    ll n, m, k;
+    cin>>n>>m>>k;
+    vector<vector<string>> v;
+    for(ll i = 0; i<k + 1; i++){
+        vector<string> w;
+        for(ll j = 0; j<n; j++){
+            string s;
+            cin>>s;
+            w.pb(s);
         }
-        perm[v[i]] = 1;
-        unused.erase(v[i]);
+        v.pb(w);
     }
-    if(flag == 1){
-        cout<<"-1\n";
-        return;
-    }
-    vl ans;
-    for(ll i = n/2 -1; i>=0; i--){
-        auto it = unused.lower_bound(v[i]);
-        if(it == unused.begin()){
-            cout<<"-1\n";
-            return;
+    vector<string> initial(n, string(m, '.'));
+    for(ll i = 0; i<n; i++){
+        for(ll j = 0; j<m; j++){
+            ll flag = 0;
+            for(ll r = 0; r < k + 1; r++){
+                if(v[r][i][j] != v[0][i][j]) flag = 1;
+            }
+            if(flag == 0) initial[i][j] = v[0][i][j];
         }
-        it--;
-        ans.pb(v[i]);
-        ans.pb(*it);
-        unused.erase(it);
     }
-    reverse(ans.begin(), ans.end());
-    assert(ans.size() == n);
-    for(ll i = 0; i<n; i++) cout<<ans[i] + 1<<' ';
-    cout<<"\n";
+    for(ll i = 0; i<n; i++){
+        for(ll j = 0; j<m; j++){
+            if(initial[i][j] == '.'){
+                initial[i][j] = 97 - initial[i-1][j];
+            }
+        }
+    }
+
+    vpl change;
+    for(ll i = 0; i<k + 1; i++){
+        ll dif = 0;
+        for(ll j = 0; j < n; j++){
+            for(ll r = 0; r < m; r++){
+                if(v[i][j][r] != initial[j][r]) dif++;
+            }
+        }
+        change.pb({dif, i});
+    }
+    sort(all(change));
+    cout<<change[0].second + 1<<'\n';
+    vvl ans;
+    for(ll i = 1; i <= k; i++){
+        ll ind = change[i].second;
+        for(ll j = 0; j<n; j++){
+            for(ll r = 0; r < m; r++){
+                if(v[ind][j][r] != initial[j][r]){
+                    ans.pb({1, j + 1, r + 1});
+                }
+            }
+        }
+        ans.pb({2, ind + 1});
+        initial = v[ind];
+    }
+    cout<<ans.size()<<'\n';
+    for(ll i = 0; i<ans.size(); i++){
+        cout<<ans[i]<<'\n';
+    }
 }
  
 int main(){
@@ -119,7 +144,7 @@ int main(){
     //    freopen("input.txt", "r", stdin);
     //    freopen("output.txt", "w", stdout);
     // #endif
-    ll t; cin>>t;
+    ll t; t = 1;
     while(t--) solve();
     return 0;
 }

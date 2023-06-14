@@ -75,41 +75,90 @@ void _print(T t, V... v) {__print(t); if (sizeof...(v)) cerr << ", "; _print(v..
 #define debug(x...)
 #endif
 // ================================== Debug Ends ==================================
+
+
+
+
+ll modpower(ll x, ll y, ll m){
+    x %= m;
+    ll ans = 1;
+    while (y > 0) {
+        if (y % 2 == 1) ans = (ans*x) % m;
+        x = (x*x) % m;
+        y /= 2;
+    }
+    return ans;
+}
+
+
+#define MAXN 1000005
+ 
+ll spf[MAXN];
+ 
+void sieve(){
+    spf[1] = 1;
+    for (ll i = 2; i<MAXN; i++) spf[i] = i;
+    for (ll i = 4; i<MAXN; i+=2) spf[i] = 2;
+    for (ll i = 3; i*i<MAXN; i++) if (spf[i] == i) for (ll j=i*i; j<MAXN; j+=i) if (spf[j]==j) spf[j] = i;
+}
+
+bool isprime(ll a){
+    if(a == 1   ||   spf[a] != a) return false;
+    return true;
+}
+
+ll fac[MAXN];
+
+void factorial(){
+    fac[0] = 1;
+    fac[1] = 1;
+    for(ll i = 2; i<MAXN; i++) fac[i] = fac[i-1]*i;
+}
+
 void solve(){
-    ll n, flag = 0;
-    cin>>n;
-    set<ll> unused;
-    for(ll i = 0; i<n; i++) unused.insert(i);
-    vl v(n/2), perm(n);
-    for(ll i = 0; i<n/2; i++){
+    ll n;cin>>n;
+    vl v(2*n);
+    map<ll,ll> m,comp;
+    for (ll i=0;i<2*n;i++) {
         cin>>v[i];
-        v[i]--;
-        if(perm[v[i]] == 1){
-            flag = 1;
+        if (!isprime(v[i])) comp[v[i]]++;
+        else m[v[i]]++;
+    }
+    ll distinct = m.size();
+    vl cnt;
+    for (auto x:m) cnt.pb(x.second);
+    // for (auto x:comp) compcnt.pb(x.sec);
+    if (distinct<n) {cout<<0;return;}
+    ll dp [distinct][n+1];
+    ll prod=1;
+    for (ll i=0;i<distinct;i++){
+        for (ll j=1;j<=n;j++) {
+            if (i==0 && j==1) dp[i][j]=cnt[i];
+            else if (i==0) dp[i][j]=0;
+            else if (j==1) dp[i][j]=dp[i-1][j]+cnt[i];
+            else dp[i][j]=(dp[i-1][j]+dp[i-1][j-1]*cnt[i])%mod;
+            dp[i][j]%=mod;
         }
-        perm[v[i]] = 1;
-        unused.erase(v[i]);
+        prod*=fac[cnt[i]];
+        prod%=mod;
     }
-    if(flag == 1){
-        cout<<"-1\n";
-        return;
+    // for (ll i=0;i<distinct;i++){
+    //     for (ll j=1;j<=n;j++) cout<<dp[i][j]<<" ";
+    //         cout<<"\n";
+    // }
+    ll compans = 1;
+    for (auto x:comp) {
+        compans*=fac[x.second];
+        compans%=mod;
     }
-    vl ans;
-    for(ll i = n/2 -1; i>=0; i--){
-        auto it = unused.lower_bound(v[i]);
-        if(it == unused.begin()){
-            cout<<"-1\n";
-            return;
-        }
-        it--;
-        ans.pb(v[i]);
-        ans.pb(*it);
-        unused.erase(it);
-    }
-    reverse(ans.begin(), ans.end());
-    assert(ans.size() == n);
-    for(ll i = 0; i<n; i++) cout<<ans[i] + 1<<' ';
-    cout<<"\n";
+    ll ans = fac[n];
+    ans = (ans*modpower(prod,mod-2,mod))%mod;
+    ans = (ans*dp[distinct-1][n])%mod;
+    ans = (ans*modpower(compans,mod-2,mod))%mod;
+    cout<<ans;
+
+
+
 }
  
 int main(){
@@ -119,7 +168,9 @@ int main(){
     //    freopen("input.txt", "r", stdin);
     //    freopen("output.txt", "w", stdout);
     // #endif
-    ll t; cin>>t;
+    sieve();
+    factorial();
+    ll t; t = 1;
     while(t--) solve();
     return 0;
 }

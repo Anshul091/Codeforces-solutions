@@ -15,6 +15,7 @@ const ll INF = LLONG_MAX;
  
 #define pb push_back
 #define mp make_pair
+#define all(x) x.begin(), x.end()
  
 // Operator overloads <<, >> 
 template<typename T1, typename T2> // cin >> pair
@@ -55,42 +56,75 @@ void _print(T t, V... v) {__print(t); if (sizeof...(v)) cerr << ", "; _print(v..
 #define debug(x...)
 #endif
 // ================================== Debug Ends ==================================
+
+ll integer_sum(ll a){
+    return a*(a+ 1)>>1;
+}
+
 void solve(){
     ll n, q;
     cin>>n>>q;
     vl v(n);
     cin>>v;
     sort(v.begin(), v.end());
+    ll sum = accumulate(all(v), 0LL);
+    vl w = v;
+    ll dum2 = n;
+    for(ll i = 0; i<n; i++){
+        w[i] += dum2;
+        dum2--;
+    }
+    ll ind = min_element(all(w)) - w.begin();
     while(q--){
         ll ans;
         ll dum;
         cin>>dum;
         ll k = dum;
-        vl w = v;
-        if(dum <= n){
-            for(ll i = 0; i<n && k > 0; i++){
-                w[i] += k;
-                k--;
-            }
-            ans = *min_element(w.begin(), w.end());
-        }
-        else{
-            for(ll i = 0; i<n - ((n-dum)&1); i++){
-                w[i] += k;
-                k--;
-            }
-            assert(k % 2 == 0);
-            k /= 2;
-            sort(w.begin(), w.end());
-            for(ll i = 0; i<n && k > 0; i++){
-                k -= w[i] - w[0];
-                w[i] = w[0];
-            }
-            if(k <= 0){
-                ans = w[0];
+        if(n == 1){
+            if(dum & 1){
+                ans = v[0] + dum;
+                dum--;
+                ans -= dum/2;
             }
             else{
-                ans = w[0] - (k+n-1)/n;
+                ans = v[0];
+                ans -= dum/2;
+            }
+        }
+        else if(dum <= n){
+            ans = v[ind] + k - ind;
+            ans = max(v[ind], ans);
+            // debug(dum);
+        }
+        else{
+            ll odd = dum - n;
+            ll mini = v[ind] + k - ind;
+            k -= n;
+            // if(ind == n-1 && odd&1){
+            //     mini++;
+            // }
+            if(odd&1){
+                mini = min(v[n-1], mini);
+                k++;
+            }
+            // debug(mini, k);
+            assert(k % 2 == 0);
+            k /= 2;
+            // debug(k);
+            k -= sum;
+            ll dif = integer_sum(dum) - integer_sum(dum - n);
+            k -= dif;
+            // debug(dif);
+            if(odd & 1){
+                k += dum - n + 1;
+            }
+            k += n * mini;
+            // debug(k);
+            if(k <= 0){
+                ans = mini;
+            }
+            else{
+                ans = mini - (k+n-1)/n;
             }
         }
         cout<<ans<<' ';
@@ -109,3 +143,9 @@ int main(){
     while(t--) solve();
     return 0;
 }
+
+
+
+
+
+

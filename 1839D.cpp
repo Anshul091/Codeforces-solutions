@@ -75,41 +75,70 @@ void _print(T t, V... v) {__print(t); if (sizeof...(v)) cerr << ", "; _print(v..
 #define debug(x...)
 #endif
 // ================================== Debug Ends ==================================
+
+
+bool customCmp(ll x, ll y) {
+    return x < y;  // Custom comparison logic
+}
+
+template<typename Compare>
+vl LIS(vl &nums, Compare cmp) {
+    ll n = nums.size();
+    vl P(n);
+    vl M(n + 1);
+    ll L = 0;
+
+    for (ll i = 0; i < n; i++) {
+        ll lo = 1, hi = L;
+
+        while (lo <= hi) {
+            ll mid = (lo + hi) / 2;
+            if (cmp(nums[M[mid]], nums[i])) {
+                lo = mid + 1;
+            } else {
+                hi = mid - 1;
+            }
+        }
+
+        ll newL = lo;
+        P[i] = M[newL - 1];
+        M[newL] = i;
+
+        L = max(L, newL);
+    }
+
+    vl S(L);
+    ll k = M[L];
+
+    for (ll i = L - 1; i >= 0; i--) {
+        S[i] = nums[k];
+        k = P[k];
+    }
+
+    return S;
+}
+
+
+
+
+
+
 void solve(){
-    ll n, flag = 0;
+    ll n;
     cin>>n;
-    set<ll> unused;
-    for(ll i = 0; i<n; i++) unused.insert(i);
-    vl v(n/2), perm(n);
-    for(ll i = 0; i<n/2; i++){
-        cin>>v[i];
-        v[i]--;
-        if(perm[v[i]] == 1){
-            flag = 1;
-        }
-        perm[v[i]] = 1;
-        unused.erase(v[i]);
-    }
-    if(flag == 1){
-        cout<<"-1\n";
-        return;
-    }
-    vl ans;
-    for(ll i = n/2 -1; i>=0; i--){
-        auto it = unused.lower_bound(v[i]);
-        if(it == unused.begin()){
-            cout<<"-1\n";
-            return;
-        }
-        it--;
-        ans.pb(v[i]);
-        ans.pb(*it);
-        unused.erase(it);
-    }
-    reverse(ans.begin(), ans.end());
-    assert(ans.size() == n);
-    for(ll i = 0; i<n; i++) cout<<ans[i] + 1<<' ';
-    cout<<"\n";
+    vl v(n);
+    cin>>v;
+    vl w = LIS(v, customCmp);
+    cout<<w<<'\n';
+    // set<ll> s;
+    // for(ll i = 0; i<w.size(); i++) s.insert(w[i]);
+    // vl b2(n);
+    // for(ll i = 0; i<n; i++){
+    //     if(s.find(v[i]) != s.end()) b2[i] = 0;
+    //     else b2[i] = 1;
+    // }
+    // vl b;
+    // for(ll i = 0; )
 }
  
 int main(){

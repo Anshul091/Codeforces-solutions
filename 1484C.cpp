@@ -75,41 +75,69 @@ void _print(T t, V... v) {__print(t); if (sizeof...(v)) cerr << ", "; _print(v..
 #define debug(x...)
 #endif
 // ================================== Debug Ends ==================================
-void solve(){
-    ll n, flag = 0;
-    cin>>n;
-    set<ll> unused;
-    for(ll i = 0; i<n; i++) unused.insert(i);
-    vl v(n/2), perm(n);
-    for(ll i = 0; i<n/2; i++){
-        cin>>v[i];
-        v[i]--;
-        if(perm[v[i]] == 1){
-            flag = 1;
-        }
-        perm[v[i]] = 1;
-        unused.erase(v[i]);
+
+bool present(ll ans, vl &v){
+    for(ll i = 0; i<v.size(); i++){
+        if(v[i] == ans) return true;
     }
-    if(flag == 1){
-        cout<<"-1\n";
+    return false;
+}
+
+void solve(){
+    ll n, m;
+    cin>>n>>m;
+    vvl v(m);
+    mll mp;
+    for(ll i = 0; i<m; i++){
+        ll k;
+        cin>>k;
+        vl temp(k);
+        for(ll j = 0; j<k; j++){
+            cin>>temp[j];
+            mp[temp[j]]++;
+        }
+        v[i] = temp;
+    }
+    ll mx = 0, maxi = -INF;
+    for(auto &&i:mp){
+        if(i.second > maxi){
+            maxi = i.second;
+            mx = i.first;
+        }
+    }
+    mll count;
+    vl ans(m, -1);
+    ll cnt = 0;
+    for(ll i = 0; i<m; i++){
+        if(v[i].size() == 1 && v[i][0] == mx){
+            ans[i] = mx;
+            cnt++;
+            count[mx]++;
+        }
+    }
+    if(cnt > (m + 1)/2){
+        cout<<"NO\n";
         return;
     }
-    vl ans;
-    for(ll i = n/2 -1; i>=0; i--){
-        auto it = unused.lower_bound(v[i]);
-        if(it == unused.begin()){
-            cout<<"-1\n";
-            return;
+    cout<<"YES\n";
+    for(ll i = 0; i<m; i++){
+        if(ans[i] == -1){
+            if(count[mx] < (m + 1)/2  && present(mx, v[i])){
+                ans[i] = mx;
+                count[mx]++;
+            }
+            else{
+                for(ll j = 0; j<v[i].size(); j++){
+                    if(v[i][j] != mx  && count[v[i][j]] < (m + 1)/2){
+                        ans[i] = v[i][j];
+                        count[v[i][j]]++;
+                        break;
+                    }
+                }
+            }
         }
-        it--;
-        ans.pb(v[i]);
-        ans.pb(*it);
-        unused.erase(it);
     }
-    reverse(ans.begin(), ans.end());
-    assert(ans.size() == n);
-    for(ll i = 0; i<n; i++) cout<<ans[i] + 1<<' ';
-    cout<<"\n";
+    cout<<ans<<"\n";
 }
  
 int main(){

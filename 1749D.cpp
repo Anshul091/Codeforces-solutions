@@ -75,41 +75,67 @@ void _print(T t, V... v) {__print(t); if (sizeof...(v)) cerr << ", "; _print(v..
 #define debug(x...)
 #endif
 // ================================== Debug Ends ==================================
+ll lcm(ll a, ll b){
+    ll g = __gcd(a, b);
+    return (a * b) / g;
+}
+
+ll modpower(ll x, ll y, ll m){
+    x %= m;
+    ll ans = 1;
+    while (y > 0) {
+        if (y % 2 == 1) ans = (ans*x) % m;
+        x = (x*x) % m;
+        y /= 2;
+    }
+    return ans;
+}
+#define MAXN 10000001
+ 
+ll spf[MAXN];
+ 
+void sieve(){
+    spf[1] = 1;
+    for (ll i = 2; i<MAXN; i++) spf[i] = i;
+    for (ll i = 4; i<MAXN; i+=2) spf[i] = 2;
+    for (ll i = 3; i*i<MAXN; i++) if (spf[i] == i) for (ll j=i*i; j<MAXN; j+=i) if (spf[j]==j) spf[j] = i;
+}
+ 
+vl getFactorization(ll x) {
+    vl ret;
+    while (x != 1){
+        ret.push_back(spf[x]);
+        x /= spf[x];
+    }
+    return ret;
+}
 void solve(){
-    ll n, flag = 0;
-    cin>>n;
-    set<ll> unused;
-    for(ll i = 0; i<n; i++) unused.insert(i);
-    vl v(n/2), perm(n);
-    for(ll i = 0; i<n/2; i++){
-        cin>>v[i];
-        v[i]--;
-        if(perm[v[i]] == 1){
-            flag = 1;
+    ll n, m;
+    cin>>n>>m;
+    vl dp(n+1);
+    dp[1] = 1;
+    for(ll i = 2; i<=n; i++){
+        dp[i] = dp[i-1];
+        if(spf[i] == i){
+            dp[i] *= i;
         }
-        perm[v[i]] = 1;
-        unused.erase(v[i]);
+        if(dp[i] > m) dp[i] = m + 100;
     }
-    if(flag == 1){
-        cout<<"-1\n";
-        return;
+    ll ans = 1;
+    ll ans2 = 0;
+    ll dum = 1;
+    for(ll i = 1; i<=n; i++){
+        ll dum2 = m/dp[i];
+        dum2 %= mod;
+        ans *= dum2;
+        ans%= mod;
+        // debug(ans);
+        dum *= (m % mod);
+        dum %= mod;
+        ans2 += (dum - ans + mod) % mod;
+        ans2 %= mod;
     }
-    vl ans;
-    for(ll i = n/2 -1; i>=0; i--){
-        auto it = unused.lower_bound(v[i]);
-        if(it == unused.begin()){
-            cout<<"-1\n";
-            return;
-        }
-        it--;
-        ans.pb(v[i]);
-        ans.pb(*it);
-        unused.erase(it);
-    }
-    reverse(ans.begin(), ans.end());
-    assert(ans.size() == n);
-    for(ll i = 0; i<n; i++) cout<<ans[i] + 1<<' ';
-    cout<<"\n";
+    cout<<ans2<<'\n';
 }
  
 int main(){
@@ -119,7 +145,9 @@ int main(){
     //    freopen("input.txt", "r", stdin);
     //    freopen("output.txt", "w", stdout);
     // #endif
-    ll t; cin>>t;
+    sieve();
+    ll t = 1;
+    // cin>>t;
     while(t--) solve();
     return 0;
 }

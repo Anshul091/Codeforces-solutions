@@ -75,41 +75,29 @@ void _print(T t, V... v) {__print(t); if (sizeof...(v)) cerr << ", "; _print(v..
 #define debug(x...)
 #endif
 // ================================== Debug Ends ==================================
+
+ll modpower(ll x, ll y, ll m){
+    x %= m;
+    ll ans = 1;
+    while (y > 0) {
+        if (y % 2 == 1) ans = (ans*x) % m;
+        x = (x*x) % m;
+        y /= 2;
+    }
+    return ans;
+}
+
 void solve(){
-    ll n, flag = 0;
+    ll n;
     cin>>n;
-    set<ll> unused;
-    for(ll i = 0; i<n; i++) unused.insert(i);
-    vl v(n/2), perm(n);
-    for(ll i = 0; i<n/2; i++){
-        cin>>v[i];
-        v[i]--;
-        if(perm[v[i]] == 1){
-            flag = 1;
-        }
-        perm[v[i]] = 1;
-        unused.erase(v[i]);
+    vl v(n);
+    cin>>v;
+    ll even_count = 0;
+    for(ll i = 0; i<n; i++){
+        if(v[i] % 2 == 0) even_count++;
     }
-    if(flag == 1){
-        cout<<"-1\n";
-        return;
-    }
-    vl ans;
-    for(ll i = n/2 -1; i>=0; i--){
-        auto it = unused.lower_bound(v[i]);
-        if(it == unused.begin()){
-            cout<<"-1\n";
-            return;
-        }
-        it--;
-        ans.pb(v[i]);
-        ans.pb(*it);
-        unused.erase(it);
-    }
-    reverse(ans.begin(), ans.end());
-    assert(ans.size() == n);
-    for(ll i = 0; i<n; i++) cout<<ans[i] + 1<<' ';
-    cout<<"\n";
+    ll ans = modpower(2, even_count, MOD);
+    cout<<ans - (even_count == n)<<'\n';
 }
  
 int main(){

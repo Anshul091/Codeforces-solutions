@@ -2,11 +2,7 @@
 using namespace std;
  
  
-#include <ext/pb_ds/assoc_container.hpp>
-#include <ext/pb_ds/tree_policy.hpp>
-using namespace __gnu_pbds;
-  
-#define ordered_set tree<int, null_type,less<int>, rb_tree_tag,tree_order_statistics_node_update>
+
  
  
  
@@ -76,40 +72,43 @@ void _print(T t, V... v) {__print(t); if (sizeof...(v)) cerr << ", "; _print(v..
 #endif
 // ================================== Debug Ends ==================================
 void solve(){
-    ll n, flag = 0;
-    cin>>n;
-    set<ll> unused;
-    for(ll i = 0; i<n; i++) unused.insert(i);
-    vl v(n/2), perm(n);
-    for(ll i = 0; i<n/2; i++){
-        cin>>v[i];
-        v[i]--;
-        if(perm[v[i]] == 1){
-            flag = 1;
+    ll n, m, k;
+    cin>>n>>m>>k;
+    vl x(k), d(k);
+    cin>>x>>d;
+    for(ll i = 0; i<k; i++) x[i]--;
+    vvl adj(n);
+    for(ll i = 0; i<m; i++){
+        ll dum, dum2;
+        cin>>dum>>dum2;
+        dum--; dum2--;
+        adj[dum].pb(dum2);
+        adj[dum2].pb(dum);
+    }
+    vl visited(n, 0);
+    priority_queue<pll> pq;
+    for(ll i = 0; i<k; i++){
+        visited[x[i]] = d[i];
+        pq.push({d[i], x[i]});
+    }
+    while(!pq.empty()){
+        ll dis = pq.top().first;
+        ll node = pq.top().second;
+        pq.pop();
+        for(auto it: adj[node]){
+            if(dis - 1 > visited[it]){
+                visited[it] = dis - 1;
+                pq.push({visited[it], it});
+            }
         }
-        perm[v[i]] = 1;
-        unused.erase(v[i]);
     }
-    if(flag == 1){
-        cout<<"-1\n";
-        return;
-    }
-    vl ans;
-    for(ll i = n/2 -1; i>=0; i--){
-        auto it = unused.lower_bound(v[i]);
-        if(it == unused.begin()){
-            cout<<"-1\n";
+    for(ll i = 0; i<n; i++){
+        if(visited[i] == 0){
+            cout<<"NO\n";
             return;
         }
-        it--;
-        ans.pb(v[i]);
-        ans.pb(*it);
-        unused.erase(it);
     }
-    reverse(ans.begin(), ans.end());
-    assert(ans.size() == n);
-    for(ll i = 0; i<n; i++) cout<<ans[i] + 1<<' ';
-    cout<<"\n";
+    cout<<"YES\n";
 }
  
 int main(){

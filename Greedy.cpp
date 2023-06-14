@@ -75,42 +75,79 @@ void _print(T t, V... v) {__print(t); if (sizeof...(v)) cerr << ", "; _print(v..
 #define debug(x...)
 #endif
 // ================================== Debug Ends ==================================
-void solve(){
-    ll n, flag = 0;
-    cin>>n;
-    set<ll> unused;
-    for(ll i = 0; i<n; i++) unused.insert(i);
-    vl v(n/2), perm(n);
-    for(ll i = 0; i<n/2; i++){
-        cin>>v[i];
-        v[i]--;
-        if(perm[v[i]] == 1){
-            flag = 1;
-        }
-        perm[v[i]] = 1;
-        unused.erase(v[i]);
+vector<ll> f(ll cursm, ll i, ll n, vector<ll>& arr, vector<vector<vector<ll>>>& memo) {
+    if (memo[cursm][i] != vector<ll>{-1}) {
+        return memo[cursm][i];
     }
-    if(flag == 1){
-        cout<<"-1\n";
+
+    if (i == n) {
+        return cursm == 0 ? vector<ll>{1} : vector<ll>{};
+    }
+
+    vector<ll> v1 = f(cursm + arr[i], i + 1, n, arr, memo);
+    if (!v1.empty()) {
+        v1.pb(arr[i]);
+        memo[cursm][i] = v1;
+        return v1;
+    }
+
+    vector<ll> v2;
+    if (cursm >= arr[i]) {
+        v2 = f(cursm - arr[i], i + 1, n, arr, memo);
+    }
+    if (!v2.empty()) {
+        v2.pb(-arr[i]);
+        memo[cursm][i] = v2;
+        return v2;
+    }
+
+    return vector<ll>{};
+}
+void solve(){
+    ll n;
+    cin >> n;
+    string s;
+    cin >> s;
+
+    if (n & 1) {
+        cout << "NO" << "\n";
         return;
     }
-    vl ans;
-    for(ll i = n/2 -1; i>=0; i--){
-        auto it = unused.lower_bound(v[i]);
-        if(it == unused.begin()){
-            cout<<"-1\n";
-            return;
+
+    vector<ll> arr{1};
+    for (ll i = 1; i < n; i++) {
+        if (s[i] == s[i - 1]) {
+            arr.back() += 1;
+        } else {
+            arr.pb(1);
         }
-        it--;
-        ans.pb(v[i]);
-        ans.pb(*it);
-        unused.erase(it);
+    }
+
+    vector<vector<vector<ll>>> memo(n + 1, vector<vector<ll>>(n + 1, vector<ll>{-1}));
+
+    vector<ll> stack = f(0, 0, arr.size(), arr, memo);
+    if (stack.empty()) {
+        cout << "NO" << "\n";
+        return;
+    }
+
+    vector<char> ans;
+    for (ll i = 1; i < stack.size(); i++) {
+        if (stack[i] > 0) {
+            ans.insert(ans.end(), stack[i], '(');
+        } else {
+            ans.insert(ans.end(), -stack[i], ')');
+        }
     }
     reverse(ans.begin(), ans.end());
-    assert(ans.size() == n);
-    for(ll i = 0; i<n; i++) cout<<ans[i] + 1<<' ';
-    cout<<"\n";
+
+    cout<<"YES\n";
+    for (ll i = 0; i < ans.size(); i++) {
+        cout<<ans[i];
+    }
+    cout<<'\n';
 }
+
  
 int main(){
     ios_base::sync_with_stdio(false);

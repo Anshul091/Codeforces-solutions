@@ -75,41 +75,32 @@ void _print(T t, V... v) {__print(t); if (sizeof...(v)) cerr << ", "; _print(v..
 #define debug(x...)
 #endif
 // ================================== Debug Ends ==================================
+
+
+
+
 void solve(){
-    ll n, flag = 0;
-    cin>>n;
-    set<ll> unused;
-    for(ll i = 0; i<n; i++) unused.insert(i);
-    vl v(n/2), perm(n);
-    for(ll i = 0; i<n/2; i++){
-        cin>>v[i];
-        v[i]--;
-        if(perm[v[i]] == 1){
-            flag = 1;
+    ll n, k, q;
+    cin>>n>>k>>q;
+    vl v(n);
+    cin>>v;
+    ll maxi = -INF;
+    ll length = 0;
+    ll ans  = 0;
+    for(ll i = 0; i<n; i++){
+        maxi = max(v[i], maxi);
+        if(maxi > q){
+            length = 0;
+            maxi = -INF;
         }
-        perm[v[i]] = 1;
-        unused.erase(v[i]);
-    }
-    if(flag == 1){
-        cout<<"-1\n";
-        return;
-    }
-    vl ans;
-    for(ll i = n/2 -1; i>=0; i--){
-        auto it = unused.lower_bound(v[i]);
-        if(it == unused.begin()){
-            cout<<"-1\n";
-            return;
+        else{
+            length++;
+            if(length >= k){
+                ans += length - k + 1;
+            }
         }
-        it--;
-        ans.pb(v[i]);
-        ans.pb(*it);
-        unused.erase(it);
     }
-    reverse(ans.begin(), ans.end());
-    assert(ans.size() == n);
-    for(ll i = 0; i<n; i++) cout<<ans[i] + 1<<' ';
-    cout<<"\n";
+    cout<<ans<<'\n';
 }
  
 int main(){

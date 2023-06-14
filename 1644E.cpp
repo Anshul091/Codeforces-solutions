@@ -76,40 +76,35 @@ void _print(T t, V... v) {__print(t); if (sizeof...(v)) cerr << ", "; _print(v..
 #endif
 // ================================== Debug Ends ==================================
 void solve(){
-    ll n, flag = 0;
+    ll n;
     cin>>n;
-    set<ll> unused;
-    for(ll i = 0; i<n; i++) unused.insert(i);
-    vl v(n/2), perm(n);
-    for(ll i = 0; i<n/2; i++){
-        cin>>v[i];
-        v[i]--;
-        if(perm[v[i]] == 1){
+    string s;
+    cin>>s;
+    ll flag = 0;
+    for(ll i = 0; i<s.size(); i++){
+        if(s[i] != s[0]){
             flag = 1;
+            break;
         }
-        perm[v[i]] = 1;
-        unused.erase(v[i]);
     }
-    if(flag == 1){
-        cout<<"-1\n";
+    if(flag == 0){
+        cout<<n<<'\n';
         return;
     }
-    vl ans;
-    for(ll i = n/2 -1; i>=0; i--){
-        auto it = unused.lower_bound(v[i]);
-        if(it == unused.begin()){
-            cout<<"-1\n";
-            return;
-        }
-        it--;
-        ans.pb(v[i]);
-        ans.pb(*it);
-        unused.erase(it);
+    ll dcount = 1, rcount = 1;
+    for(ll i = 0; i<s.size(); i++){
+        if(s[i] == 'D') dcount++;
+        else rcount++;
     }
-    reverse(ans.begin(), ans.end());
-    assert(ans.size() == n);
-    for(ll i = 0; i<n; i++) cout<<ans[i] + 1<<' ';
-    cout<<"\n";
+    // debug(dcount, rcount);
+    ll ans = s.size() + 1;
+    ans += n*n - dcount*rcount;
+    ll i = 0;
+    // debug(ans);
+    while(s[i] == s[0]) i++;
+    ll row = (s[0] == 'D') ? n - rcount: n - dcount;
+    ans -= row*i;
+    cout<<ans<<'\n';
 }
  
 int main(){

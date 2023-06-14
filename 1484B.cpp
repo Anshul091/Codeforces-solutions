@@ -76,40 +76,68 @@ void _print(T t, V... v) {__print(t); if (sizeof...(v)) cerr << ", "; _print(v..
 #endif
 // ================================== Debug Ends ==================================
 void solve(){
-    ll n, flag = 0;
-    cin>>n;
-    set<ll> unused;
-    for(ll i = 0; i<n; i++) unused.insert(i);
-    vl v(n/2), perm(n);
-    for(ll i = 0; i<n/2; i++){
-        cin>>v[i];
-        v[i]--;
-        if(perm[v[i]] == 1){
-            flag = 1;
-        }
-        perm[v[i]] = 1;
-        unused.erase(v[i]);
+    ll n;
+    cin >> n;
+
+    vl arr(n);
+    cin>>arr;
+
+    if (n <= 2) {
+        cout<<"0\n";
+        return;
     }
-    if(flag == 1){
+    ll c = arr[1] - arr[0];
+    bool valid = true;
+    for (ll i = 1; i < n; i++) {
+        if (arr[i] != arr[i - 1] + c) {
+            valid = false;
+            break;
+        }
+    }
+
+    if (valid) {
+        cout <<"0\n";
+        return;
+    }
+
+    set<ll> seen;
+    for (ll i = 1; i < n; i++) {
+        seen.insert(arr[i] - arr[i - 1]);
+    }
+
+    if (seen.count(0) || seen.size() > 2) {
+        cout <<"-1\n";
+        return;
+    }
+
+    vector<ll> lst(seen.begin(), seen.end());
+    sort(lst.begin(), lst.end());
+
+    if (lst.size() == 1 && lst[0] < 0) {
         cout<<"-1\n";
         return;
     }
-    vl ans;
-    for(ll i = n/2 -1; i>=0; i--){
-        auto it = unused.lower_bound(v[i]);
-        if(it == unused.begin()){
-            cout<<"-1\n";
-            return;
-        }
-        it--;
-        ans.pb(v[i]);
-        ans.pb(*it);
-        unused.erase(it);
+
+        ll g = lst[1] - lst[0];
+        c = lst[1];
+
+        if (g <= *max_element(arr.begin(), arr.end()) || lst[0] * lst[1] > 0) {
+        cout<<"-1\n";
+        return;
     }
-    reverse(ans.begin(), ans.end());
-    assert(ans.size() == n);
-    for(ll i = 0; i<n; i++) cout<<ans[i] + 1<<' ';
-    cout<<"\n";
+
+    valid = true;
+    for (ll i = 1; i < n; i++) {
+        if (arr[i] != (arr[i - 1] + c) % g) {
+            valid = false;
+            cout <<"-1\n";
+            break;
+        }
+    }
+
+    if (valid) {
+        cout<<g<<' '<<c<<'\n';
+    }
 }
  
 int main(){

@@ -75,41 +75,82 @@ void _print(T t, V... v) {__print(t); if (sizeof...(v)) cerr << ", "; _print(v..
 #define debug(x...)
 #endif
 // ================================== Debug Ends ==================================
+
+
+
+void dfs(ll node, ll ans, vvl &adj, vl &par, vl &s){
+    s.pb(node);
+	if (ll(s.size()) >= ans)
+		par[node] = s[s.size() - ans];
+	for (auto u : adj[node])
+		dfs(u, ans, adj, par, s);
+	s.pop_back();
+}
+
+
+
+void dfs2(ll node, vvl &adj, vb &visited){
+    visited[node] = true;
+    for(auto &it: adj[node]){
+        if(!visited[it])
+        dfs2(it, adj, visited);
+    }
+}
+
+
+
+
+bool good(ll ans, ll k, vvl &adj){
+    ll n = adj.size();
+    vl par(n, -1);
+    vl s;
+	dfs(0, ans, adj, par, s);
+	vl dum, h(n);
+	queue<ll> q;
+	q.push(0);
+	while (!q.empty()){
+		ll node = q.front();
+		dum.push_back(node);
+		q.pop();
+		for (auto i: adj[node]){
+			q.push(i);
+			h[i] = h[node] + 1;
+		}
+	}
+	reverse(dum.begin(), dum.end());
+    vb visited(n, false);
+	ll check = 0;
+	for (ll node : dum){
+        if (!visited[node] && h[node] > ans){
+		    check++;
+		    dfs2(par[node], adj, visited);
+        }
+	}
+	
+	return check <= k;
+}
+
 void solve(){
-    ll n, flag = 0;
-    cin>>n;
-    set<ll> unused;
-    for(ll i = 0; i<n; i++) unused.insert(i);
-    vl v(n/2), perm(n);
-    for(ll i = 0; i<n/2; i++){
-        cin>>v[i];
-        v[i]--;
-        if(perm[v[i]] == 1){
-            flag = 1;
+    ll n, k;
+    cin>>n>>k;
+    vvl adj(n);
+    for(ll i = 1; i<n; i++){
+        ll dum;
+        cin>>dum;
+        adj[dum-1].pb(i);
+    }
+    ll st = 1, h = n-1;
+    ll ans = -1;
+    while (st <= h){
+        ll mid = (st+h)/2;
+        if(good(mid, k, adj)){
+            ans = mid;
+            h = mid-1;
         }
-        perm[v[i]] = 1;
-        unused.erase(v[i]);
+        else st = mid+1;
+        // debug(mid);
     }
-    if(flag == 1){
-        cout<<"-1\n";
-        return;
-    }
-    vl ans;
-    for(ll i = n/2 -1; i>=0; i--){
-        auto it = unused.lower_bound(v[i]);
-        if(it == unused.begin()){
-            cout<<"-1\n";
-            return;
-        }
-        it--;
-        ans.pb(v[i]);
-        ans.pb(*it);
-        unused.erase(it);
-    }
-    reverse(ans.begin(), ans.end());
-    assert(ans.size() == n);
-    for(ll i = 0; i<n; i++) cout<<ans[i] + 1<<' ';
-    cout<<"\n";
+    cout<<ans<<"\n";
 }
  
 int main(){

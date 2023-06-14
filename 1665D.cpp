@@ -75,41 +75,21 @@ void _print(T t, V... v) {__print(t); if (sizeof...(v)) cerr << ", "; _print(v..
 #define debug(x...)
 #endif
 // ================================== Debug Ends ==================================
+
+ll query(ll a, ll b){
+    cout<<"? "<<a<<' '<<b<<endl;
+    ll x;
+    cin>>x;
+    return x;
+}
+
 void solve(){
-    ll n, flag = 0;
-    cin>>n;
-    set<ll> unused;
-    for(ll i = 0; i<n; i++) unused.insert(i);
-    vl v(n/2), perm(n);
-    for(ll i = 0; i<n/2; i++){
-        cin>>v[i];
-        v[i]--;
-        if(perm[v[i]] == 1){
-            flag = 1;
-        }
-        perm[v[i]] = 1;
-        unused.erase(v[i]);
+    ll rem = 0;
+    for(ll i = 1; i<=30; i++){
+        ll dum = query((1<<(i - 1)) - rem, (1<<(i - 1)) - rem + (1<<i));
+        if(dum == 1<<i) rem += (1<<(i -1));
     }
-    if(flag == 1){
-        cout<<"-1\n";
-        return;
-    }
-    vl ans;
-    for(ll i = n/2 -1; i>=0; i--){
-        auto it = unused.lower_bound(v[i]);
-        if(it == unused.begin()){
-            cout<<"-1\n";
-            return;
-        }
-        it--;
-        ans.pb(v[i]);
-        ans.pb(*it);
-        unused.erase(it);
-    }
-    reverse(ans.begin(), ans.end());
-    assert(ans.size() == n);
-    for(ll i = 0; i<n; i++) cout<<ans[i] + 1<<' ';
-    cout<<"\n";
+    cout<<"! "<<rem<<endl;
 }
  
 int main(){
@@ -119,6 +99,8 @@ int main(){
     //    freopen("input.txt", "r", stdin);
     //    freopen("output.txt", "w", stdout);
     // #endif
+    // ll dum = 1<<0;
+    // cout<<dum<<endl;
     ll t; cin>>t;
     while(t--) solve();
     return 0;

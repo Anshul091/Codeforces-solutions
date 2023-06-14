@@ -75,42 +75,70 @@ void _print(T t, V... v) {__print(t); if (sizeof...(v)) cerr << ", "; _print(v..
 #define debug(x...)
 #endif
 // ================================== Debug Ends ==================================
-void solve(){
-    ll n, flag = 0;
-    cin>>n;
-    set<ll> unused;
-    for(ll i = 0; i<n; i++) unused.insert(i);
-    vl v(n/2), perm(n);
-    for(ll i = 0; i<n/2; i++){
-        cin>>v[i];
-        v[i]--;
-        if(perm[v[i]] == 1){
-            flag = 1;
+
+vl is_prime;
+void sieve(int n = 1000005) {
+    is_prime.resize(n + 1, true);
+    is_prime[0] = is_prime[1] = false;
+    for (int i = 2; i <= sqrt(n); i++) {
+        if (is_prime[i]) {
+            for (int j = i * i; j <= n; j += i) {
+                is_prime[j] = false;
+            }
         }
-        perm[v[i]] = 1;
-        unused.erase(v[i]);
     }
-    if(flag == 1){
-        cout<<"-1\n";
+}
+void solve(){
+    ll n, m;
+    cin >> n >> m;
+    if (!is_prime[m]) {
+        for (ll st = 1; st <= n * m; st += m) {
+            for (ll i = st; i < st + m; i++) {
+                cout << i << " ";
+            }
+            cout << '\n';
+        }
         return;
     }
-    vl ans;
-    for(ll i = n/2 -1; i>=0; i--){
-        auto it = unused.lower_bound(v[i]);
-        if(it == unused.begin()){
-            cout<<"-1\n";
-            return;
+    if (!is_prime[n]) {
+        vector<vector<ll>> ans(n, vector<ll>(m, 0));
+        ll cnt = 1;
+        for (ll j = 0; j < m; j++) {
+            for (ll i = 0; i < n; i++) {
+                ans[i][j] = cnt++;
+            }
         }
-        it--;
-        ans.pb(v[i]);
-        ans.pb(*it);
-        unused.erase(it);
+
+        for (const auto& row : ans) {
+            for (ll num : row) {
+                cout << num << " ";
+            }
+            cout << '\n';
+        }
+        return;
     }
-    reverse(ans.begin(), ans.end());
-    assert(ans.size() == n);
-    for(ll i = 0; i<n; i++) cout<<ans[i] + 1<<' ';
-    cout<<"\n";
+
+    vvl ans(n, vl(m, 0));
+    ll idx = 0;
+    for (ll i = 0; i < n; i += 2) {
+        ans[idx++][0] = i * m + 1;
+    }
+    for (ll j = 1; j < n; j += 2) {
+        ans[idx++][0] = j * m + 1;
+    }
+    for (ll i = 0; i < n; i++) {
+        for (ll j = 1; j < m; j++) {
+            ans[i][j] = ans[i][0] + j;
+        }
+    }
+    for (auto &row : ans) {
+        for (ll num : row) {
+            cout << num << " ";
+        }
+        cout << '\n';
+    }
 }
+//Anshul Mittal
  
 int main(){
     ios_base::sync_with_stdio(false);
@@ -119,6 +147,7 @@ int main(){
     //    freopen("input.txt", "r", stdin);
     //    freopen("output.txt", "w", stdout);
     // #endif
+    sieve();
     ll t; cin>>t;
     while(t--) solve();
     return 0;

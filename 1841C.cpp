@@ -75,41 +75,62 @@ void _print(T t, V... v) {__print(t); if (sizeof...(v)) cerr << ", "; _print(v..
 #define debug(x...)
 #endif
 // ================================== Debug Ends ==================================
-void solve(){
-    ll n, flag = 0;
-    cin>>n;
-    set<ll> unused;
-    for(ll i = 0; i<n; i++) unused.insert(i);
-    vl v(n/2), perm(n);
-    for(ll i = 0; i<n/2; i++){
-        cin>>v[i];
-        v[i]--;
-        if(perm[v[i]] == 1){
-            flag = 1;
+
+ll valcalc(vl &v){
+    ll ans = 0;
+    ll mx = -1;
+    for(ll i = v.size() - 1; i>=0; i--){
+        ll cur = pow(10, v[i]);
+        if(v[i] < mx){
+            cur = -cur;
         }
-        perm[v[i]] = 1;
-        unused.erase(v[i]);
+        ans += cur;
+        mx = max(mx, v[i]);
     }
-    if(flag == 1){
-        cout<<"-1\n";
+    return ans;
+}
+
+
+void solve(){
+    string s;
+    cin>>s;
+
+    if(s.size() == 1){
+        cout<<"10000\n";
         return;
     }
-    vl ans;
-    for(ll i = n/2 -1; i>=0; i--){
-        auto it = unused.lower_bound(v[i]);
-        if(it == unused.begin()){
-            cout<<"-1\n";
-            return;
-        }
-        it--;
-        ans.pb(v[i]);
-        ans.pb(*it);
-        unused.erase(it);
+    vl num(s.size());
+    ll n = s.size();
+    for(ll i = 0; i<n; i++){
+        num[i] = s[i] - 'A';
     }
-    reverse(ans.begin(), ans.end());
-    assert(ans.size() == n);
-    for(ll i = 0; i<n; i++) cout<<ans[i] + 1<<' ';
-    cout<<"\n";
+    vl left(5, n), right(5, -1);
+    for(ll i = n - 1; i>=0; i--){
+        left[num[i]] = i;
+    }
+    for(ll i = 0; i<n; i++){
+        right[num[i]] = i;
+    }
+    ll ans = valcalc(num);
+    for(ll i = 0; i<5; i++){
+        if(left[i] == n) continue;
+        ll dum = num[left[i]];
+        for(ll j = 0; j<5; j++){
+            num[left[i]] = j;
+            ans = max(ans, valcalc(num));
+        }
+        num[left[i]] = dum;
+    }
+    for(ll i = 0; i<5; i++){
+        if(right[i] == -1) continue;
+        ll dum = num[right[i]];
+        for(ll j = 0; j<5; j++){
+            num[right[i]] = j;
+            ans = max(ans, valcalc(num));
+        }
+        num[right[i]] = dum;
+    }
+    cout<<ans<<'\n';
 }
  
 int main(){

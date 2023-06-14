@@ -76,40 +76,45 @@ void _print(T t, V... v) {__print(t); if (sizeof...(v)) cerr << ", "; _print(v..
 #endif
 // ================================== Debug Ends ==================================
 void solve(){
-    ll n, flag = 0;
-    cin>>n;
-    set<ll> unused;
-    for(ll i = 0; i<n; i++) unused.insert(i);
-    vl v(n/2), perm(n);
-    for(ll i = 0; i<n/2; i++){
-        cin>>v[i];
-        v[i]--;
-        if(perm[v[i]] == 1){
-            flag = 1;
-        }
-        perm[v[i]] = 1;
-        unused.erase(v[i]);
-    }
-    if(flag == 1){
-        cout<<"-1\n";
+    ll n;
+    cin >> n;
+    
+    vl arr(n);
+    cin>>arr;
+
+    if (arr[0] == 1) {
+        cout << "2 " << distance(arr.begin(), find(arr.begin(), arr.end(), n)) + 1 << endl;
         return;
     }
-    vl ans;
-    for(ll i = n/2 -1; i>=0; i--){
-        auto it = unused.lower_bound(v[i]);
-        if(it == unused.begin()){
-            cout<<"-1\n";
-            return;
-        }
-        it--;
-        ans.pb(v[i]);
-        ans.pb(*it);
-        unused.erase(it);
+
+    if (arr[n - 1] == 1) {
+        cout << n - 1 << " " << distance(arr.begin(), find(arr.begin(), arr.end(), n)) + 1 << endl;
+        return;
     }
-    reverse(ans.begin(), ans.end());
-    assert(ans.size() == n);
-    for(ll i = 0; i<n; i++) cout<<ans[i] + 1<<' ';
-    cout<<"\n";
+
+    ll mx = distance(arr.begin(), find(arr.begin(), arr.end(), n));
+    ll one = distance(arr.begin(), find(arr.begin(), arr.end(), 1));
+    ll two = distance(arr.begin(), find(arr.begin(), arr.end(), 2));
+
+    if (one < two && two < mx) {
+        cout << two + 1 << " " << mx + 1 << '\n';
+    }
+    else if (one < mx && mx < two) {
+        cout << "1 1" << '\n';
+    }
+    else if (two < one && one < mx) {
+        cout << one + 1 << " " << mx + 1 << '\n';
+    }
+    else if (two < mx && mx < one) {
+        cout << "1 1" << '\n';
+    }
+    else if (mx < one && one < two) {
+        cout << mx + 1 << " " << one + 1 << '\n';
+    }
+    else if (mx < two && two < one) {
+        cout << mx + 1 << " " << two + 1 << '\n';
+    }
+
 }
  
 int main(){

@@ -75,41 +75,57 @@ void _print(T t, V... v) {__print(t); if (sizeof...(v)) cerr << ", "; _print(v..
 #define debug(x...)
 #endif
 // ================================== Debug Ends ==================================
+
+void bfs(ll node, vvl &adj, vl &dist){
+    queue<ll> q;
+    q.push(node);
+    dist[node] = 0;
+    while(!q.empty()){
+        ll curr = q.front();
+        q.pop();
+        for(auto it: adj[curr]){
+            if(dist[it] == -1){
+                dist[it] = dist[curr] + 1;
+                q.push(it);
+            }
+        }
+    }
+}
+
+
 void solve(){
-    ll n, flag = 0;
-    cin>>n;
-    set<ll> unused;
-    for(ll i = 0; i<n; i++) unused.insert(i);
-    vl v(n/2), perm(n);
-    for(ll i = 0; i<n/2; i++){
-        cin>>v[i];
-        v[i]--;
-        if(perm[v[i]] == 1){
-            flag = 1;
-        }
-        perm[v[i]] = 1;
-        unused.erase(v[i]);
+    ll n, m, k;
+    cin>>n>>m>>k;
+    vl spec(k);
+    cin>>spec;
+    for(ll i = 0; i<k; i++) spec[i]--;
+    vl dis1(n, -1);
+    vl dis2(n, -1);
+    vvl adj(n);
+    for(ll i = 0; i<m; i++){
+        ll u, v; 
+        cin>>u>>v;
+        u--; v--;
+        adj[u].pb(v);
+        adj[v].pb(u);
     }
-    if(flag == 1){
-        cout<<"-1\n";
-        return;
+    bfs(0, adj, dis1);
+    bfs(n-1, adj, dis2);
+    vpl dist(k);
+    for(ll i = 0; i<k; i++){
+        dist[i] = {dis1[spec[i]] , dis2[spec[i]]};
     }
-    vl ans;
-    for(ll i = n/2 -1; i>=0; i--){
-        auto it = unused.lower_bound(v[i]);
-        if(it == unused.begin()){
-            cout<<"-1\n";
-            return;
-        }
-        it--;
-        ans.pb(v[i]);
-        ans.pb(*it);
-        unused.erase(it);
+    sort(all(dist));
+    ll ans = -INF;
+    vl suf(k);
+    for(ll i = k - 1; i>=0; i--){
+        suf[i] = dist[i].second;
+        if(i != k-1) suf[i] = max(suf[i], suf[i+1]);
     }
-    reverse(ans.begin(), ans.end());
-    assert(ans.size() == n);
-    for(ll i = 0; i<n; i++) cout<<ans[i] + 1<<' ';
-    cout<<"\n";
+    for(ll i = 0; i<k - 1; i++){
+        ans = max(ans, dist[i].first + 1 + suf[i+1]);
+    }
+    cout<<min(ans, dis1[n-1])<<'\n';
 }
  
 int main(){
@@ -119,7 +135,7 @@ int main(){
     //    freopen("input.txt", "r", stdin);
     //    freopen("output.txt", "w", stdout);
     // #endif
-    ll t; cin>>t;
+    ll t; t = 1;
     while(t--) solve();
     return 0;
 }

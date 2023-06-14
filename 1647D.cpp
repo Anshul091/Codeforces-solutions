@@ -75,41 +75,69 @@ void _print(T t, V... v) {__print(t); if (sizeof...(v)) cerr << ", "; _print(v..
 #define debug(x...)
 #endif
 // ================================== Debug Ends ==================================
-void solve(){
-    ll n, flag = 0;
-    cin>>n;
-    set<ll> unused;
-    for(ll i = 0; i<n; i++) unused.insert(i);
-    vl v(n/2), perm(n);
-    for(ll i = 0; i<n/2; i++){
-        cin>>v[i];
-        v[i]--;
-        if(perm[v[i]] == 1){
-            flag = 1;
-        }
-        perm[v[i]] = 1;
-        unused.erase(v[i]);
+
+ll modpower(ll x, ll y, ll m){
+    x %= m;
+    ll ans = 1;
+    while (y > 0) {
+        if (y % 2 == 1) ans = (ans*x) % m;
+        x = (x*x) % m;
+        y /= 2;
     }
-    if(flag == 1){
-        cout<<"-1\n";
+    return ans;
+}
+
+
+bool isprime(ll a){
+    if(a < 1) return false;
+    if(a <= 2) return true;
+    if(modpower(2, a - 1, a) == 1) return true;
+    return false;
+}
+
+bool divisible(ll a, ll b){
+    if(a >= b){
+        if(a % b == 0)  return true;
+    }
+    return false;
+}
+
+
+void solve(){
+    ll x, d;
+    cin>>x>>d;
+    ll sq = d*d;
+    if(x < sq    ||  x % sq != 0      ||  isprime(x/sq)){
+        cout<<"NO\n";
         return;
     }
-    vl ans;
-    for(ll i = n/2 -1; i>=0; i--){
-        auto it = unused.lower_bound(v[i]);
-        if(it == unused.begin()){
-            cout<<"-1\n";
+    ll dum = x/sq;
+    // if(!isprime(d)){
+    //     cout<<"YES\n";
+    //     return;
+    // }
+    ll cnt = 0;
+    while(x % d == 0 && x >= d) {x /= d; cnt++;}
+    if(x == 1 || isprime(x)){
+        if(isprime(d)){
+            cout<<"NO\n";
             return;
         }
-        it--;
-        ans.pb(v[i]);
-        ans.pb(*it);
-        unused.erase(it);
+        if(cnt != 3) cout<<"YES\n";
+        else{
+            ll root = sqrt(d);
+            for(ll i = 2; i<=root; i++){
+                if(d % i == 0){
+                    if(!divisible(i * x, d) ||  !divisible(d/i * x, d)){
+                        cout<<"YES\n";
+                        return;
+                    }
+                }
+            }
+            cout<<"NO\n";
+        }
     }
-    reverse(ans.begin(), ans.end());
-    assert(ans.size() == n);
-    for(ll i = 0; i<n; i++) cout<<ans[i] + 1<<' ';
-    cout<<"\n";
+    else cout<<"YES\n";
 }
  
 int main(){

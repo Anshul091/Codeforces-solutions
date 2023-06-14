@@ -75,41 +75,50 @@ void _print(T t, V... v) {__print(t); if (sizeof...(v)) cerr << ", "; _print(v..
 #define debug(x...)
 #endif
 // ================================== Debug Ends ==================================
+#define MAXN (int)1e6+10
+
 void solve(){
-    ll n, flag = 0;
+    vl v(MAXN);
+    ll n;
     cin>>n;
-    set<ll> unused;
-    for(ll i = 0; i<n; i++) unused.insert(i);
-    vl v(n/2), perm(n);
-    for(ll i = 0; i<n/2; i++){
-        cin>>v[i];
-        v[i]--;
-        if(perm[v[i]] == 1){
-            flag = 1;
-        }
-        perm[v[i]] = 1;
-        unused.erase(v[i]);
+    ll st = n;
+    ll dum = 0;
+    ll mx = n;
+    for (ll i = 0; i <= 320; i++) {
+        ll delta = rand()%MAXN;
+        cout<<"+ "<<delta<<endl;
+        cin >> n;
+        dum += delta;
+        mx = max(mx, n);
     }
-    if(flag == 1){
-        cout<<"-1\n";
-        return;
-    }
-    vl ans;
-    for(ll i = n/2 -1; i>=0; i--){
-        auto it = unused.lower_bound(v[i]);
-        if(it == unused.begin()){
-            cout<<"-1\n";
+    cout<<"- "<<dum<<endl;
+    cin>>n;
+    cout<<"+ "<<mx - 1<<endl;
+    dum = mx - 1;
+    cin >> n;
+    v[n] = mx;
+    for (ll i = 0; i < 350; i++) {
+        cout<<"+ 1"<<endl;
+        cin>>n;
+        dum++;
+        v[n] = mx + i + 1;
+        if (n == st) {
+            cout<<"! "<<mx + i<<endl;
             return;
         }
-        it--;
-        ans.pb(v[i]);
-        ans.pb(*it);
-        unused.erase(it);
     }
-    reverse(ans.begin(), ans.end());
-    assert(ans.size() == n);
-    for(ll i = 0; i<n; i++) cout<<ans[i] + 1<<' ';
-    cout<<"\n";
+    cout<<"- "<<dum<<endl;
+    cin >> n;
+    ll ans = 0;
+    while (1) {
+        cout<<"- 350"<<endl;
+        ans += 350;
+        cin >> n;
+        if (v[n]) {
+            cout<<"! "<<ans + v[n] - 1<<endl;
+            return;
+        }
+    }
 }
  
 int main(){
@@ -119,7 +128,8 @@ int main(){
     //    freopen("input.txt", "r", stdin);
     //    freopen("output.txt", "w", stdout);
     // #endif
-    ll t; cin>>t;
+    srand(time(0));
+    ll t; t = 1;
     while(t--) solve();
     return 0;
 }

@@ -76,41 +76,52 @@ void _print(T t, V... v) {__print(t); if (sizeof...(v)) cerr << ", "; _print(v..
 #endif
 // ================================== Debug Ends ==================================
 void solve(){
-    ll n, flag = 0;
-    cin>>n;
-    set<ll> unused;
-    for(ll i = 0; i<n; i++) unused.insert(i);
-    vl v(n/2), perm(n);
-    for(ll i = 0; i<n/2; i++){
-        cin>>v[i];
-        v[i]--;
-        if(perm[v[i]] == 1){
-            flag = 1;
-        }
-        perm[v[i]] = 1;
-        unused.erase(v[i]);
+    ll n;
+    cin >> n;
+    vl arr(n);
+    for (ll i = 0; i < n; i++) {
+        cin >> arr[i];
     }
-    if(flag == 1){
-        cout<<"-1\n";
+    
+    if (arr[n-1] != 0) {
+        cout << "NO" << '\n';
         return;
     }
-    vl ans;
-    for(ll i = n/2 -1; i>=0; i--){
-        auto it = unused.lower_bound(v[i]);
-        if(it == unused.begin()){
-            cout<<"-1\n";
-            return;
+
+    vvl a2;
+    a2.pb({arr[0]});
+    for (ll i = 1; i < n; i++) {
+        if (arr[i] == 0) {
+            if (a2.back().back() == 1) {
+                a2.back().push_back(arr[i]);
+            } else {
+                a2.push_back({arr[i]});
+            }
+        } else {
+            if (a2.back().back() == 1) {
+                a2.back().push_back(arr[i]);
+            } else {
+                a2.push_back({arr[i]});
+            }
         }
-        it--;
-        ans.pb(v[i]);
-        ans.pb(*it);
-        unused.erase(it);
     }
-    reverse(ans.begin(), ans.end());
-    assert(ans.size() == n);
-    for(ll i = 0; i<n; i++) cout<<ans[i] + 1<<' ';
-    cout<<"\n";
+    vl ans;
+    reverse(a2.begin(), a2.end());
+    for (auto &i : a2) {
+        ll cnt = i.size();
+        ans.insert(ans.end(), cnt - 1, 0);
+        if (cnt > 0) {
+            ans.push_back(cnt - 1);
+        }
+    }
+    
+    cout<<"YES\n";
+    for (auto i : ans) {
+        cout<<i<<' ';
+    }
+    cout<<'\n';
 }
+
  
 int main(){
     ios_base::sync_with_stdio(false);

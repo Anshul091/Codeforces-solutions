@@ -76,40 +76,40 @@ void _print(T t, V... v) {__print(t); if (sizeof...(v)) cerr << ", "; _print(v..
 #endif
 // ================================== Debug Ends ==================================
 void solve(){
-    ll n, flag = 0;
-    cin>>n;
-    set<ll> unused;
-    for(ll i = 0; i<n; i++) unused.insert(i);
-    vl v(n/2), perm(n);
-    for(ll i = 0; i<n/2; i++){
-        cin>>v[i];
-        v[i]--;
-        if(perm[v[i]] == 1){
-            flag = 1;
+    ll n, k;
+    cin>>n>>k;
+    vl order(n);
+    cin>>order;
+    vl cold(k), hot(k);
+    cin>>cold>>hot;
+    vl cpu(2, 0);
+    vvl index(k + 1);
+    for(ll i = 0; i<n; i++){
+        index[order[i]].pb(i);
+    }
+    for(ll i = 0; i<=k; i++){
+        index[i].pb(n);
+    }
+    ll ans = 0;
+    for(ll i = 0; i<n; i++){
+        if(order[i] == cpu[0] || order[i] == cpu[1]){
+            ans += hot[order[i] - 1];
+            continue;
         }
-        perm[v[i]] = 1;
-        unused.erase(v[i]);
-    }
-    if(flag == 1){
-        cout<<"-1\n";
-        return;
-    }
-    vl ans;
-    for(ll i = n/2 -1; i>=0; i--){
-        auto it = unused.lower_bound(v[i]);
-        if(it == unused.begin()){
-            cout<<"-1\n";
-            return;
+
+        ll ind1 = *lower_bound(all(index[cpu[0]]), i);
+        ll ind2 = *lower_bound(all(index[cpu[1]]), i);
+        if(ind1 < ind2){
+            cpu[1] = order[i];  
+            ans += cold[order[i] - 1];
         }
-        it--;
-        ans.pb(v[i]);
-        ans.pb(*it);
-        unused.erase(it);
+        else{
+            cpu[0] = order[i];
+            ans += cold[order[i] - 1];
+        }
+        // debug(ans);
     }
-    reverse(ans.begin(), ans.end());
-    assert(ans.size() == n);
-    for(ll i = 0; i<n; i++) cout<<ans[i] + 1<<' ';
-    cout<<"\n";
+    cout<<ans<<'\n';
 }
  
 int main(){

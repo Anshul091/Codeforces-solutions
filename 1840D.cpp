@@ -75,41 +75,59 @@ void _print(T t, V... v) {__print(t); if (sizeof...(v)) cerr << ", "; _print(v..
 #define debug(x...)
 #endif
 // ================================== Debug Ends ==================================
+
+// bool good(vl &v, ll mid){
+
+//     // ll ind = upper_bound(all(v), v[0] + 2*mid) - v.begin();
+//     // if(ind >= n-2) return true;
+//     // ll ind2 = upper_bound(all(v), v[ind] + 2*mid) - v.begin();
+//     // if(ind2 >= n-1) return true;
+//     // ll ind3 = upper_bound(all(v), v[ind2] + 2*mid) - v.begin();
+//     // if(ind3 >= n) return true;
+//     // return false;
+// }
+
 void solve(){
-    ll n, flag = 0;
+    ll n;
     cin>>n;
-    set<ll> unused;
-    for(ll i = 0; i<n; i++) unused.insert(i);
-    vl v(n/2), perm(n);
-    for(ll i = 0; i<n/2; i++){
-        cin>>v[i];
-        v[i]--;
-        if(perm[v[i]] == 1){
-            flag = 1;
-        }
-        perm[v[i]] = 1;
-        unused.erase(v[i]);
+    vl v(n);
+    cin>>v;
+    sort(all(v));
+    ll l = 0, r = v[n-1];
+    ll ans = -1;
+    while(l <= r){
+	    ll mid = l + (r-l)/2;
+        bool flag = false;
+        ll ind = upper_bound(all(v), v[0] + 2*mid) - v.begin();
+        if(ind >= n-2) flag = true;
+        ll ind2 = upper_bound(all(v), v[ind] + 2*mid) - v.begin();
+        if(ind2 >= n-1) flag = true;
+        ll ind3 = upper_bound(all(v), v[ind2] + 2*mid) - v.begin();
+        if(ind3 >= n) flag = true;
+	    if(flag){
+	    	ans = mid;
+	    	r = mid-1;
+	    }
+	    else{
+	    l = mid+1;
+	    }
     }
-    if(flag == 1){
-        cout<<"-1\n";
-        return;
-    }
-    vl ans;
-    for(ll i = n/2 -1; i>=0; i--){
-        auto it = unused.lower_bound(v[i]);
-        if(it == unused.begin()){
-            cout<<"-1\n";
-            return;
-        }
-        it--;
-        ans.pb(v[i]);
-        ans.pb(*it);
-        unused.erase(it);
-    }
-    reverse(ans.begin(), ans.end());
-    assert(ans.size() == n);
-    for(ll i = 0; i<n; i++) cout<<ans[i] + 1<<' ';
-    cout<<"\n";
+    cout<<ans<<'\n';
+    // for(ll i = 0; i < n; i++){
+    //     ll dum = (v[i] - v[0] + 1)/2;
+    //     if(i >= n-2){
+    //         ans = min(ans, dum);
+    //         break;
+    //     }
+    //     ll ind = upper_bound(all(v), v[i+1] + 2*dum) - v.begin();
+    //     ll ind2 = upper_bound(all(v), v[ind] + 2*dum) - v.begin();
+    //     if(ind2 == n){
+    //         ans = min(ans, dum);
+    //         return;
+    //     }
+    //     ll dum1 = v[ind] - v[i + 1] + 1 >> 1;
+    //     ll dum2 = 
+    // }
 }
  
 int main(){

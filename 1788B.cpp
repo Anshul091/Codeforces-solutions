@@ -75,41 +75,50 @@ void _print(T t, V... v) {__print(t); if (sizeof...(v)) cerr << ", "; _print(v..
 #define debug(x...)
 #endif
 // ================================== Debug Ends ==================================
+
+ll numberconverter(vl &a){
+    ll n = a.size();
+    if(a.size() == 0) return 0;
+    else if(a.size() == 1) return a[0];
+    ll ans = 0;
+    ll cnt = 1;
+    for(ll i = a.size() - 1; i>= 0; i--){
+        ans += a[i] * cnt;
+        cnt *= 10;
+    }
+    return ans;
+}
+
 void solve(){
-    ll n, flag = 0;
+    ll n;
     cin>>n;
-    set<ll> unused;
-    for(ll i = 0; i<n; i++) unused.insert(i);
-    vl v(n/2), perm(n);
-    for(ll i = 0; i<n/2; i++){
-        cin>>v[i];
-        v[i]--;
-        if(perm[v[i]] == 1){
-            flag = 1;
+    vl v;
+    ll dum = n;
+    while(n > 0){
+        v.pb(n % 10);
+        n /= 10;
+    }
+    reverse(all(v));
+    vl x, y;
+    ll flag = 0;
+    for(ll i = 0; i<v.size(); i++){
+        ll a1 = v[i]/2;
+        ll a2 = v[i]/2;
+        if(v[i] % 2 == 1){
+            if(flag == 0){
+                a1++;
+                flag = 1;
+            }
+            else{
+                a2++;
+                flag = 0;
+            }
         }
-        perm[v[i]] = 1;
-        unused.erase(v[i]);
+        x.pb(a1);
+        y.pb(a2);
     }
-    if(flag == 1){
-        cout<<"-1\n";
-        return;
-    }
-    vl ans;
-    for(ll i = n/2 -1; i>=0; i--){
-        auto it = unused.lower_bound(v[i]);
-        if(it == unused.begin()){
-            cout<<"-1\n";
-            return;
-        }
-        it--;
-        ans.pb(v[i]);
-        ans.pb(*it);
-        unused.erase(it);
-    }
-    reverse(ans.begin(), ans.end());
-    assert(ans.size() == n);
-    for(ll i = 0; i<n; i++) cout<<ans[i] + 1<<' ';
-    cout<<"\n";
+    cout<<numberconverter(x)<<' '<<numberconverter(y)<<'\n';
+    
 }
  
 int main(){

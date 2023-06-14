@@ -76,40 +76,90 @@ void _print(T t, V... v) {__print(t); if (sizeof...(v)) cerr << ", "; _print(v..
 #endif
 // ================================== Debug Ends ==================================
 void solve(){
-    ll n, flag = 0;
-    cin>>n;
-    set<ll> unused;
-    for(ll i = 0; i<n; i++) unused.insert(i);
-    vl v(n/2), perm(n);
-    for(ll i = 0; i<n/2; i++){
-        cin>>v[i];
-        v[i]--;
-        if(perm[v[i]] == 1){
-            flag = 1;
+    string A, B;
+    cin >> A >> B;
+    ll t, q;
+    cin >> t >> q;
+    
+    vvl queries(q);
+    for (ll i = 0; i < q; i++) {
+        vl w;
+        ll test;
+        cin>>test;
+        w.pb(test);
+        if(test == 1){
+            ll dum;
+            cin>>dum;
+            w.pb(dum);
         }
-        perm[v[i]] = 1;
-        unused.erase(v[i]);
-    }
-    if(flag == 1){
-        cout<<"-1\n";
-        return;
-    }
-    vl ans;
-    for(ll i = n/2 -1; i>=0; i--){
-        auto it = unused.lower_bound(v[i]);
-        if(it == unused.begin()){
-            cout<<"-1\n";
-            return;
+        else if(test == 2){
+            for(ll j = 0; j<4; j++){
+                ll dum;
+                cin>>dum;
+                w.pb(dum);
+            }
         }
-        it--;
-        ans.pb(v[i]);
-        ans.pb(*it);
-        unused.erase(it);
+        queries[i] = w;
     }
-    reverse(ans.begin(), ans.end());
-    assert(ans.size() == n);
-    for(ll i = 0; i<n; i++) cout<<ans[i] + 1<<' ';
-    cout<<"\n";
+    
+    ll n = A.length();
+    ll unmatch = 0;
+    
+    for (ll i = 0; i < n; i++) {
+        if (A[i] != B[i]) {
+            unmatch++;
+        }
+    }
+    
+    for (ll i = 0; i < queries.size(); i++) {
+        if (i - t >= 0) {
+            vector<ll> prevq = queries[i - t];
+            if (prevq[0] == 1) {
+                ll pos = prevq[1] - 1;
+                if (A[pos] != B[pos]) {
+                    unmatch++;
+                }
+            }
+        }
+        
+        vector<ll> q = queries[i];
+        if (q[0] == 1) {
+            ll pos = q[1] - 1;
+            if (A[pos] != B[pos]) {
+                unmatch--;
+            }
+        }
+        else if (q[0] == 2) {
+            ll v1 = q[1] - 1, pos1 = q[2] - 1, v2 = q[3] - 1, pos2 = q[4] - 1;
+            if (A[pos1] != B[pos1]) {
+                unmatch--;
+            }
+            if (A[pos2] != B[pos2]) {
+                unmatch--;
+            }
+            if (v1 == 0 && v2 == 0) {
+                swap(A[pos1], A[pos2]);
+            }
+            else if (v1 == 0 && v2 == 1) {
+                swap(A[pos1], B[pos2]);
+            }
+            else if (v1 == 1 && v2 == 0) {
+                swap(B[pos1], A[pos2]);
+            }
+            else if (v1 == 1 && v2 == 1) {
+                swap(B[pos1], B[pos2]);
+            }
+            if (A[pos1] != B[pos1]) {
+                unmatch++;
+            }
+            if (A[pos2] != B[pos2]) {
+                unmatch++;
+            }
+        }
+        else if (q[0] == 3) {
+            cout << (unmatch == 0 ? "YES" : "NO") << '\n';
+        }
+    }
 }
  
 int main(){

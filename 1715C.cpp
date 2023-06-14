@@ -76,40 +76,67 @@ void _print(T t, V... v) {__print(t); if (sizeof...(v)) cerr << ", "; _print(v..
 #endif
 // ================================== Debug Ends ==================================
 void solve(){
-    ll n, flag = 0;
-    cin>>n;
-    set<ll> unused;
-    for(ll i = 0; i<n; i++) unused.insert(i);
-    vl v(n/2), perm(n);
-    for(ll i = 0; i<n/2; i++){
-        cin>>v[i];
-        v[i]--;
-        if(perm[v[i]] == 1){
-            flag = 1;
+    ll n, m;
+    cin>>n>>m;
+    vl v(n);
+    cin>>v;
+    // assert(n != 1);
+    // if(n == 1){
+    //     for(ll i = 0; i<m; i++){
+    //         ll ind, val;
+    //         cin>>ind>>val;
+    //         cout<<"1\n";
+    //     }
+    //     return;
+    // }
+    vl dp(n + 1);
+    dp[0] = 1;
+    dp[1] = 3 + (v[0] != v[1]);
+    for(ll i = 2; i<n; i++){
+        if(v[i] == v[i-1]){
+            dp[i] = dp[i-1] + 1 + dp[i -1] - dp[i - 2];              //Add dp[i-1] for all subarrays before the last one
+        }                                                            // The rest three terms are the awesomeness of the subarrys including the current index
+        else{
+            dp[i] = dp[i-1] + 1 + dp[i - 1] - dp[i - 2] + i;
         }
-        perm[v[i]] = 1;
-        unused.erase(v[i]);
     }
-    if(flag == 1){
-        cout<<"-1\n";
-        return;
-    }
-    vl ans;
-    for(ll i = n/2 -1; i>=0; i--){
-        auto it = unused.lower_bound(v[i]);
-        if(it == unused.begin()){
-            cout<<"-1\n";
-            return;
+    while(m--){
+        ll ind, val;
+        cin>>ind>>val;  ind--;
+        if(val == v[ind]);
+        // else if(ind > 0 && ind < n-1     &&      v[ind - 1] == v[ind + 1]){
+        //     if(v[ind] == v[ind+1]){
+        //         dp[n-1] += (ind + 1)*(n - ind) - 1;
+        //         dp[n-1] += ind*(n - ind - 1);
+        //     }
+        //     else if(val == v[ind+1]){
+        //         dp[n-1] -= (ind + 1)*(n - ind) - 1;
+        //     }
+        // }
+        else{
+            if(ind > 0){
+                if(val == v[ind-1]){
+                    dp[n-1] -= ind* (n - ind); 
+                    // debug(m, dp[n -1]);
+                }
+                else if(v[ind] == v[ind-1]){
+                    dp[n-1] += ind*(n - ind);
+                }
+                // debug(m, dp[n -1]);
+            }
+            if(ind < n-1){
+                if(val == v[ind+1]){
+                    dp[n-1] -= (ind + 1)* (n - ind - 1); 
+                }
+                else if(v[ind] == v[ind+1]){
+                    dp[n-1] += (ind + 1)* (n - ind - 1);
+                }
+                // debug(m, dp[n -1]);
+            }
         }
-        it--;
-        ans.pb(v[i]);
-        ans.pb(*it);
-        unused.erase(it);
+        cout<<dp[n-1]<<'\n';
+        v[ind] = val;
     }
-    reverse(ans.begin(), ans.end());
-    assert(ans.size() == n);
-    for(ll i = 0; i<n; i++) cout<<ans[i] + 1<<' ';
-    cout<<"\n";
 }
  
 int main(){
@@ -119,7 +146,7 @@ int main(){
     //    freopen("input.txt", "r", stdin);
     //    freopen("output.txt", "w", stdout);
     // #endif
-    ll t; cin>>t;
+    ll t; t = 1;
     while(t--) solve();
     return 0;
 }

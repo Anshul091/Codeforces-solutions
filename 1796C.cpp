@@ -76,49 +76,44 @@ void _print(T t, V... v) {__print(t); if (sizeof...(v)) cerr << ", "; _print(v..
 #endif
 // ================================== Debug Ends ==================================
 void solve(){
-    ll n, flag = 0;
-    cin>>n;
-    set<ll> unused;
-    for(ll i = 0; i<n; i++) unused.insert(i);
-    vl v(n/2), perm(n);
-    for(ll i = 0; i<n/2; i++){
-        cin>>v[i];
-        v[i]--;
-        if(perm[v[i]] == 1){
-            flag = 1;
-        }
-        perm[v[i]] = 1;
-        unused.erase(v[i]);
-    }
-    if(flag == 1){
-        cout<<"-1\n";
+    ll l, r;
+    cin>>l>>r;
+    if(2*l > r){
+        cout<<"1 "<<r - l + 1<<'\n';
         return;
     }
-    vl ans;
-    for(ll i = n/2 -1; i>=0; i--){
-        auto it = unused.lower_bound(v[i]);
-        if(it == unused.begin()){
-            cout<<"-1\n";
-            return;
-        }
-        it--;
-        ans.pb(v[i]);
-        ans.pb(*it);
-        unused.erase(it);
+    ll left = l;
+    ll cnt = 0;
+    while(left <= r){
+        left *= 2;
+        cnt++;
     }
-    reverse(ans.begin(), ans.end());
-    assert(ans.size() == n);
-    for(ll i = 0; i<n; i++) cout<<ans[i] + 1<<' ';
-    cout<<"\n";
+    left /= 2;
+    cnt--;
+    ll ans = 0;
+    ll power = powl(2, cnt);
+    ll dum = r - left;
+    ans += dum / power + 1;
+    if((left/2) * 3  <= r){
+        power /= 2;
+        power *= 3; 
+        left = left/2 * 3;
+        dum = r - left;
+        ll dum2 = 0;
+        dum2 = dum / power + 1;
+        dum2 *= cnt;
+        ans += dum2;
+    }
+    cout<<cnt+1<<' '<<ans<<'\n';
 }
  
 int main(){
     ios_base::sync_with_stdio(false);
     cin.tie(nullptr); cout.tie(nullptr);
-    // #ifndef ONLINE_JUDGE
-    //    freopen("input.txt", "r", stdin);
-    //    freopen("output.txt", "w", stdout);
-    // #endif
+    #ifndef ONLINE_JUDGE
+       freopen("input.txt", "r", stdin);
+       freopen("output.txt", "w", stdout);
+    #endif
     ll t; cin>>t;
     while(t--) solve();
     return 0;

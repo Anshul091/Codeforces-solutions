@@ -76,40 +76,33 @@ void _print(T t, V... v) {__print(t); if (sizeof...(v)) cerr << ", "; _print(v..
 #endif
 // ================================== Debug Ends ==================================
 void solve(){
-    ll n, flag = 0;
-    cin>>n;
-    set<ll> unused;
-    for(ll i = 0; i<n; i++) unused.insert(i);
-    vl v(n/2), perm(n);
-    for(ll i = 0; i<n/2; i++){
-        cin>>v[i];
-        v[i]--;
-        if(perm[v[i]] == 1){
-            flag = 1;
+    ll n, k;
+    cin>>n>>k;
+    vl v(n);
+    cin>>v;
+    vvl dp(n, vl(n + 1));
+    if(v[0] == 1) dp[0][0] = 1;
+    // debug(dp[0]);
+    for(ll i = 1; i<n; i++){
+        dp[i][0] = dp[i-1][0];
+        if(v[i] == i + 1) dp[i][0]++;
+        for(ll j = 1; j<n; j++){
+            if(j >= i + 1){
+                dp[i][j] = 0;
+            }
+            else{
+                dp[i][j] = max(dp[i-1][j - 1], dp[i-1][j] + (v[i] == i - j + 1));
+            }
         }
-        perm[v[i]] = 1;
-        unused.erase(v[i]);
+        // debug(i, dp[i]);
     }
-    if(flag == 1){
-        cout<<"-1\n";
-        return;
-    }
-    vl ans;
-    for(ll i = n/2 -1; i>=0; i--){
-        auto it = unused.lower_bound(v[i]);
-        if(it == unused.begin()){
-            cout<<"-1\n";
+    for(ll i = 0; i<=n; i++){
+        if(dp[n - 1][i] >= k){
+            cout<<i<<'\n';
             return;
         }
-        it--;
-        ans.pb(v[i]);
-        ans.pb(*it);
-        unused.erase(it);
     }
-    reverse(ans.begin(), ans.end());
-    assert(ans.size() == n);
-    for(ll i = 0; i<n; i++) cout<<ans[i] + 1<<' ';
-    cout<<"\n";
+    cout<<"-1\n";
 }
  
 int main(){

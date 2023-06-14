@@ -76,40 +76,26 @@ void _print(T t, V... v) {__print(t); if (sizeof...(v)) cerr << ", "; _print(v..
 #endif
 // ================================== Debug Ends ==================================
 void solve(){
-    ll n, flag = 0;
-    cin>>n;
-    set<ll> unused;
-    for(ll i = 0; i<n; i++) unused.insert(i);
-    vl v(n/2), perm(n);
-    for(ll i = 0; i<n/2; i++){
-        cin>>v[i];
-        v[i]--;
-        if(perm[v[i]] == 1){
-            flag = 1;
-        }
-        perm[v[i]] = 1;
-        unused.erase(v[i]);
+    ll n, m;
+    cin>>n>>m;
+    vector<pair<ll, pair<ll, ll>>> v(m);
+    for(ll i = 0; i<m; i++){
+        cin>>v[i].second.first>>v[i].first;
+        v[i].second.second = i + 1;
     }
-    if(flag == 1){
-        cout<<"-1\n";
-        return;
+    ll weight = 0;
+    vpl ind;
+    sort(v.begin(), v.end());
+    for(ll i = 0; i<2*n; i++){
+        weight += v[i].first;
+        ind.pb(v[i].second);
     }
-    vl ans;
-    for(ll i = n/2 -1; i>=0; i--){
-        auto it = unused.lower_bound(v[i]);
-        if(it == unused.begin()){
-            cout<<"-1\n";
-            return;
-        }
-        it--;
-        ans.pb(v[i]);
-        ans.pb(*it);
-        unused.erase(it);
+    cout<<weight<<'\n';
+    sort(ind.begin(), ind.end());
+    for(ll i = 0; i<n; i++){
+        cout<<ind[i].second<<' '<<ind[2*n - 1 - i].second<<'\n';
     }
-    reverse(ans.begin(), ans.end());
-    assert(ans.size() == n);
-    for(ll i = 0; i<n; i++) cout<<ans[i] + 1<<' ';
-    cout<<"\n";
+    cout<<'\n';
 }
  
 int main(){
